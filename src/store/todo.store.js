@@ -1,6 +1,6 @@
 import { Todo } from "../todos/models/todo.model";
 
-const Filters = {
+export const Filters = {
 
 All: 'all',
 Completed: 'Completed',
@@ -12,7 +12,7 @@ const state = {
 
     todos: [
         new Todo('Piedra del Alma'),
-        new Todo('Piedra del Infinito'),
+        new Todo('Piedra del Espacio'),
         new Todo('Piedra del Tiempo'),
         new Todo('Piedra del Poder'),
         new Todo('Piedra del Realidad'),
@@ -23,14 +23,26 @@ const state = {
 
 const initStore = () => {
 
-    console.log(state);
+    loadStore();
     console.log('InitStore 🍌');
 
 }
 
 const loadStore = () => {
-    throw new Error('Not implemented');
+
+if(!localStorage.getItem('state') ) return;
+
+const { todos = [], filter = Filters.All } = JSON.parse(localStorage.getItem('state'));
+
+state.todos = todos;
+state.filter = filter;
+
 }
+
+const saveStateToLocalStorage = () => {
+    localStorage.setItem('state', JSON.stringify(state));
+}
+
 
 const getTodos = ( filter = Filters.All ) => {
     switch ( filter ) {
@@ -60,6 +72,8 @@ const addTodo = ( description ) =>{
 
     state.todos.push(new Todo(description) );
 
+    saveStateToLocalStorage();
+
 }
 
 /**
@@ -75,6 +89,8 @@ if( todo.id === todoId ){
 return todo;
 });
 
+saveStateToLocalStorage();
+
 }
 
 /**
@@ -84,7 +100,7 @@ return todo;
 const deleteTodo = ( todoId ) => {
 
     state.todos = state.todos.filter( todo => todo.id !== todoId ); //REGRESAR TODOS CUYO ID NO SEA IGUAL AL QUE ESTAN QUERIENDO ELIMINAR. ESO SERA ELIMINADO DEL LISTADO
-
+    saveStateToLocalStorage();
 }
 /**
  * 
@@ -92,8 +108,9 @@ const deleteTodo = ( todoId ) => {
  */
 const deleteCompleted = ( todoId ) => {
 
-    state.todos = state.todos.filter( todo => todo.done ); 
+    state.todos = state.todos.filter( todo => !todo.done ); 
 
+    saveStateToLocalStorage();
 
 }
 
@@ -102,9 +119,8 @@ const deleteCompleted = ( todoId ) => {
  * @param {Filters} newFilter 
  */
 const setFilter = ( newFilter = Filters.All ) => {
-    //Object.keys(Filters).includes
     state.filter = newFilter;
-
+    saveStateToLocalStorage();
 }
 
 const getCurrentFilter = () => {
